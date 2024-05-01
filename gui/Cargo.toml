@@ -1,0 +1,14 @@
+[package]
+name = "gui"
+version = "0.1.0"
+edition = "2021"
+build = "build.rs"
+
+[dependencies]
+slint = "1.5"
+
+[dependencies.btdmm_comm]
+path = "../btdmm_comm"
+
+[build-dependencies]
+slint-build = "1.5"

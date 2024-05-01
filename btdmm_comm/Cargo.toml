@@ -1,0 +1,16 @@
+[package]
+name = "btdmm_comm"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+btleplug = "0.11"
+uuid = { version = "1.8", features = ["v4"] }
+packed_struct = "0.10"
+thiserror = "1.0"
+futures = "0.3"
+phf = { version = "0.11", features = ["macros"] }
+async-recursion = "1.1"
+async-std = "1.12"

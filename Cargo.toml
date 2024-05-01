@@ -1,0 +1,1 @@
+workspace = { members = ["btdmm_comm", "cli", "gui"], resolver = "2" }
