@@ -1,17 +1,250 @@
-import { Button, VerticalBox } from "std-widgets.slint";
+import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
+
+global Segment {
+    out property <float> svg_w: 70;
+    out property <float> svg_h: 18;
+    out property <float> dot_w_ratio: 1;
+    out property <float> minus_w_ratio: 2.5;
+}
+
+
+component HorizontalSegment {
+    in property <length> length;
+    in property <color> color;
+
+    property <length> scaled_width: length;
+    property <length> scaled_height: length * (18.0 / 70.0);
+
+    Path {
+        width: scaled_width;
+        height: scaled_height;
+        commands: "m2.3812 0-2.3812 2.3812 2.3812 2.3812h13.758l2.3812-2.3812-2.3812-2.3812z";
+        fill: color;
+    }
+}
+
+component VerticalSegment {
+    in property <length> length;
+    in property <color> color;
+
+    private property <length> scaled_width: length * (70.0 / 18.0);
+    private property <length> scaled_height: length;
+
+    Path {
+        width: scaled_width;
+        height: scaled_height;
+        commands: "m6.8792 9.2604 2.3813 2.3812 2.3812-2.3812v-13.758l-2.3812-2.3813-2.3813 2.3813z";
+
+        fill: color;
+    }
+}
+
+component SevenSegmentDisplayBox {
+    in property <color> segment_color_a;
+    in property <color> segment_color_b;
+    in property <color> segment_color_c;
+    in property <color> segment_color_d;
+    in property <color> segment_color_e;
+    in property <color> segment_color_f;
+    in property <color> segment_color_g;
+
+    preferred-width: 50px;
+
+    private property <length> segment_length: self.width * 70 / 88;
+    private property <length> segment_width: segment_length / 70 * 18;
+
+    height: segment_length * 2 + segment_width;
+
+    // Segment A - Top horizontal segment
+    HorizontalSegment {
+        length: segment_length;
+        color: segment_color_a;
+        x: segment_length / 2 + segment_width / 2;
+        y: segment_width / 2;
+    }
+    // Segment B - Upper right vertical segment
+    VerticalSegment {
+        length: segment_length;
+        color: segment_color_b;
+        x: segment_length + segment_width / 2;
+        y: segment_length / 2 + segment_width / 2;
+    }
+    // Segment C - Upper left vertical segment
+    VerticalSegment {
+        length: segment_length;
+        color: segment_color_c;
+        x: segment_width / 2;
+        y: segment_length / 2 + segment_width / 2;
+    }
+    // Segment D - Middle segment
+    HorizontalSegment {
+        length: segment_length;
+        color: segment_color_d;
+        x: segment_length / 2 + segment_width / 2;
+        y: segment_length + segment_width / 2;
+    }
+    // Segment E - Lower left vertical segment
+    VerticalSegment {
+        length: segment_length;
+        color: segment_color_e;
+        x: segment_width / 2;
+        y: segment_length * 1.5 + segment_width / 2;
+    }
+    // Segment F - Lower right vertical segment
+    VerticalSegment {
+        length: segment_length;
+        color: segment_color_f;
+        x: segment_length + segment_width / 2;
+        y: segment_length * 1.5 + segment_width / 2;
+    }
+    // Segment G - Middle horizontal segment
+    HorizontalSegment {
+        length: segment_length;
+        color: segment_color_g;
+        x: segment_length / 2 + segment_width / 2;
+        y: segment_length * 2 + segment_width / 2;
+    }
+}
+
+export component AspectRatioBox {
+    width: 100%;
+    height: 100%;
+    in property <float> aspect_ratio_w;
+    in property <float> aspect_ratio_h;
+
+    private property <float> aspect_ratio: aspect_ratio_h / aspect_ratio_w;
+
+    private property <length> height_from_width: self.width * aspect_ratio;
+    private property <length> width_from_height: self.height / aspect_ratio;
+
+    private property <length> ss_h: height_from_width < self.height ? height_from_width : self.height;
+    private property <length> ss_w: width_from_height < self.width ? width_from_height : self.width;
+
+    Rectangle {
+        width: ss_w;
+        height: ss_h;
+
+        @children
+    }
+}
+
+// This intermediate box makes sure the 7-segment display is fits the bounding box
+export component SevenSegmentDisplay {
+    in property <color> segment_color_a;
+    in property <color> segment_color_b;
+    in property <color> segment_color_c;
+    in property <color> segment_color_d;
+    in property <color> segment_color_e;
+    in property <color> segment_color_f;
+    in property <color> segment_color_g;
+
+
+    AspectRatioBox {
+        aspect_ratio_w: 70 + 18;
+        aspect_ratio_h: 70 * 2 + 18;
+
+        SevenSegmentDisplayBox {
+            width: 100%;
+            height: 100%;
+
+            segment_color_a: segment_color_a;
+            segment_color_b: segment_color_b;
+            segment_color_c: segment_color_c;
+            segment_color_d: segment_color_d;
+            segment_color_e: segment_color_e;
+            segment_color_f: segment_color_f;
+            segment_color_g: segment_color_g;
+        }
+    }
+}
+
+export component Dot {
+    in property <color> color;
+
+    ar := AspectRatioBox {
+        aspect_ratio_h: 70 * 2 + 18;
+        aspect_ratio_w: 20;
+
+        VerticalLayout {
+            Rectangle {
+                height: 87%;  // computed manually
+            }
+
+            Rectangle {
+                height: self.width;
+                background: color;
+            }
+        }
+    }
+}
+
+export component Minus {
+    in property <color> color;
+
+    AspectRatioBox {
+        aspect_ratio_h: 70 * 2 + 18;
+        aspect_ratio_w: 18 * Segment.minus_w_ratio;
+
+        Rectangle {
+            width: 100%;
+            height: self.width / Segment.minus_w_ratio;
+
+            background: color;
+        }
+    }
+}
 
 export component AppWindow inherits Window {
-    in-out property<int> counter: 42;
-    callback request-increase-value();
-    VerticalBox {
-        Text {
-            text: "Counter: \{root.counter}";
+    min-width: 100px;
+
+    HorizontalLayout {
+        Minus {
+            color: red;
         }
-        Button {
-            text: "Increase value";
-            clicked => {
-                root.request-increase-value();
-            }
+        SevenSegmentDisplay {
+            segment_color_a: red;
+            segment_color_b: orange;
+            segment_color_c: yellow;
+            segment_color_d: green;
+            segment_color_e: blue;
+            segment_color_f: violet;
+            segment_color_g: purple;
+        }
+        Dot {
+            color: red;
+        }
+        SevenSegmentDisplay {
+            segment_color_a: red;
+            segment_color_b: orange;
+            segment_color_c: yellow;
+            segment_color_d: green;
+            segment_color_e: blue;
+            segment_color_f: violet;
+            segment_color_g: purple;
+        }
+        Dot {
+            color: red;
+        }
+        SevenSegmentDisplay {
+            segment_color_a: red;
+            segment_color_b: orange;
+            segment_color_c: yellow;
+            segment_color_d: green;
+            segment_color_e: blue;
+            segment_color_f: violet;
+            segment_color_g: purple;
+        }
+        Dot {
+            color: red;
+        }
+        SevenSegmentDisplay {
+            segment_color_a: red;
+            segment_color_b: orange;
+            segment_color_c: yellow;
+            segment_color_d: green;
+            segment_color_e: blue;
+            segment_color_f: violet;
+            segment_color_g: purple;
         }
     }
 }
