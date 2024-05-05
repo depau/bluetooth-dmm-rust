@@ -113,6 +113,7 @@ pub enum DisplayIcon {
     Hertz,
     Hold,
     KiloOhm,
+    LowBattery,
     Max,
     MegaOhm,
     MicroAmpere,
@@ -130,7 +131,7 @@ pub enum DisplayIcon {
 }
 
 static DMM_3_ICONS: [DisplayIcon; 32] = [
-    DisplayIcon::Unknown("?1"),
+    DisplayIcon::LowBattery,
     DisplayIcon::Delta,
     DisplayIcon::Bluetooth,
     DisplayIcon::Buzz,
